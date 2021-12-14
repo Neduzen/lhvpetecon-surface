@@ -2,6 +2,7 @@ import ee
 from ee import EEException
 from ee.batch import Export
 from mongoengine import *
+from Constants import ASSETPATH_EU
 import DriveApi
 import logging
 
@@ -23,15 +24,14 @@ class Country:
     def __init__(self, countryDB):
         self.countryDB = countryDB
 
-    # Asset paths
-    ASSET = "users/patricklehnert/"
-    ASSETNAME = ASSET + "Landcover/"
-
     def GetName(self):
         return self.countryDB.name
 
     def GetAssetName(self):
-        return (self.ASSETNAME + self.GetName() + '/').replace(" ", "-")
+        return (ASSETPATH_EU + self.GetName() + '/').replace(" ", "-")
+
+    def GetGridAssetName(self):
+        return self.GetAssetName() + "Grid"
 
     def GetPrio(self):
         return self.countryDB.prio
@@ -116,28 +116,26 @@ class Country:
         return classifierCorine
 
     def DoGridCellsExist(self):
-        gridAssetPath = self.GetAssetName() + 'Grid/'
+        gridCells = self.GetGridCells()
+        if gridCells is None:
+            return False
+        expectedGridCount = len(gridCells)
+        if expectedGridCount == 0:
+            return False
         try:
-            gridAssets = ee.data.listAssets({"parent": "projects/earthengine-legacy/assets/" + self.GetAssetName() + "Grid"})
-            allExist = 0
-            gridCellFileList = []
-            for g in self.GetGridCells():
-                gridCellFileList.append(gridAssetPath + "grid-" + str(g[0]))
-            assetlist = gridAssets["assets"]
-            for a in assetlist:
-                if a["id"] in gridCellFileList:
-                    allExist += 1
-            if allExist > 0 and allExist == len(self.GetGridCells()):
+            gridFeature = ee.FeatureCollection(self.GetGridAssetName())
+            if len(gridFeature.getInfo()["features"]) == expectedGridCount:
                 return True
-        except EEException:
-            logging.WARNING("Exception raised in DoGridCellsExist {}".format(EEException))
+            print("Expected Gridcells: {}, Actual Gridcells: {}".format(expectedGridCount, len(gridFeature.getInfo()["features"])))
+        except:
+            print("Exception raised in DoGridCellsExist")
             return False
         return False
 
-    def IsClassificationFinished(self):
-        self.countryDB.GridCells, finished = DriveApi.CheckClassificationProgress(self.GetName(), self.GetGridCells())
-        self.Save()
-        return finished
+    # def IsClassificationFinished(self):
+    #     self.countryDB.GridCells, finished = DriveApi.CheckClassificationProgress(self.GetName(), self.GetGridCells())
+    #     self.Save()
+    #     return finished
 
     def IsImageExportFinished(self):
         for g in self.GetGridCells():

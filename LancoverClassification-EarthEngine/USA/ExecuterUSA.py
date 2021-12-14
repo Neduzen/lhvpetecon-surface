@@ -85,7 +85,7 @@ class ExecuterUSA:
             if len(state.GetGridCells()) == 0 or not state.DoGridCellsExist():
                 # Split grid cells if not existing
                 self.reportStep("Country: {}, split grid".format(state.GetName()))
-                cells = GridSplitter().SplitGrid(state.GetFeature(), state.GetAssetName())
+                cells = GridSplitter().SplitGrid(state.GetFeature(), state.GetGridAssetName())
                 state.stateDB.gridCells = cells
                 state.Save()
                 return None
@@ -93,7 +93,9 @@ class ExecuterUSA:
                 # Next classification tasks if no all finished
                 if not state.hasImages():
                     imager = ImageExporter()
-                    imager.RunImage(state, self.GetTrainingsData(True, state), self.startYear, self.endYear)
+                    retVal = imager.RunImage(state, self.GetTrainingsData(True, state), self.startYear, self.endYear)
+                    if retVal == 0:
+                        self.RunNextTask()
                     return None
                 else:
                     # Finish state

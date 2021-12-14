@@ -37,7 +37,7 @@ class GridSplitter:
         task = Export.table.toAsset(
             collection=gridCellFeatures,
             description="grid",
-            assetId=assetName + "GridState")
+            assetId=assetName)
         task.start()
 
         print("1'degree cells for country: {}".format(gridCells))

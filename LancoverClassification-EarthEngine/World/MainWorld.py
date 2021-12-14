@@ -7,7 +7,6 @@
 from ee import EEException
 from pymongo import MongoClient
 from mongoengine import *
-
 import logging
 import ee
 from apscheduler.schedulers.blocking import BlockingScheduler

@@ -92,7 +92,7 @@ class ExecuterWorld:
             manualCells = []
             if country.CountryWDB.hasManualGridCells:
                 manualCells = country.GetGridCells
-            country.CountryWDB.gridCells = GridSplitter().SplitGrid(country.GetFeature(), country.GetAssetName(), manualCells)
+            country.CountryWDB.gridCells = GridSplitter().SplitGrid(country.GetFeature(), country.GetGridPath, manualCells)
             country.Save()
             return None
         # If country has not yet all images, export further cells

@@ -22,14 +22,16 @@ class ImageExporter:
 
         # If not finished, export next cell, else mark as finished
         if len(imageProgress[0]) == 0:
-            state.StateDB.hasImages = True
+            state.stateDB.hasImages = True
             state.Save()
             print("no image left")
+            return 0
         else:
             # First cell not executed, execute
             cell = imageProgress[0][0]
             print("Total cells: {} , finished: {}: , todo: {}".format(len(rasterCells), len(rasterCells)-len(imageProgress[0]),len(imageProgress[0])))
             self.RunCellImage(cell)
+            return 1
 
     def RunCellImage(self, cell):
         DriveApi.CreateImageFolder(self.state.GetName(), cell)

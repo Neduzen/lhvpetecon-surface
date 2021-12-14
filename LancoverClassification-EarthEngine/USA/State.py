@@ -4,6 +4,8 @@ from ee.batch import Export
 from mongoengine import *
 import DriveApi
 import logging
+from Constants import ASSETPATH_US
+from Constants import CLIMATESHAPE_US
 
 class StateDB(Document):
     name = StringField(required=True, max_length=200)
@@ -22,18 +24,17 @@ class State:
     def __init__(self, stateDB):
         self.stateDB = stateDB
 
-    ASSET = 'users/emap1/'
-    ASSETPATH = ASSET + "Landcover-USA/"
-    CLIMATESHAPE = ASSETPATH + "climateShape-USA"
-
     def GetName(self):
         return self.stateDB.name
 
     def GetAssetName(self):
-        return (self.ASSETPATH + self.GetName() + '/').replace(" ", "-")
+        return (ASSETPATH_US + self.GetName() + '/').replace(" ", "-")
+
+    def GetGridAssetName(self):
+        return self.GetAssetName() + "GridState"
 
     def GetTrainingAssetName(self):
-        return self.GetTrainingAssetName() + "Training/"
+        return self.GetAssetName() + "Training/"
 
     def GetPrio(self):
         return self.stateDB.prio
@@ -76,12 +77,12 @@ class State:
             return False
 
         try:
-            gridFeature = ee.FeatureCollection(self.GetAssetName()+"GridState")
+            gridFeature = ee.FeatureCollection(self.GetGridAssetName())
             if len(gridFeature.getInfo()["features"]) == expectedGridCount:
                 return True
             print("Expected Gridcells: {}, Actual Gridcells: {}".format(expectedGridCount, len(gridFeature.getInfo()["features"])))
         except:
-            print("Exception raised in DoGridCellsExist")
+            print("Grid Cells not available")
             return False
         return False
 
@@ -89,7 +90,7 @@ class State:
         self.stateDB.save()
 
     def CalculateClimatePercentage(self):
-        climateShape = ee.FeatureCollection(self.CLIMATESHAPE)
+        climateShape = ee.FeatureCollection(CLIMATESHAPE_US)
         stateShape = ee.Feature(self.GetFeature().first())
 
         climateShapeB = climateShape.filter(ee.Filter.eq('zone', 1))

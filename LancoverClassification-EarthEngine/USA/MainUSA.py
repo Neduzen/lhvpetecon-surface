@@ -9,12 +9,12 @@ import logging
 import ee
 from apscheduler.schedulers.blocking import BlockingScheduler
 from USA.ExecuterUSA import ExecuterUSA
+from Constants import ASSETPATH_US
 
 ################################################################
 # SETUP PARAMETERS
 start_year = 2005
 end_year = 2021
-assetName = ""
 ################################################################
 
 ee.Initialize()
@@ -64,6 +64,9 @@ for c in states:
         c.stateDB.prio= 3
     elif c.GetName() == 'California':
         c.stateDB.prio = 2
+        # c.stateDB.gridCells = []
+        # c.stateDB.hasImages = False
+        # c.stateDB.isFinished = False
     elif c.GetName() == 'Massachusetts':
         c.stateDB.prio = 12
     elif c.GetName() == 'Connecticut':
@@ -131,23 +134,6 @@ for c in states:
         c.stateDB.prio = 30
     elif c.stateDB.name == "Alaska":
         c.stateDB.isFinished = True
-
-        #c.stateDB.gridCells = [('17RKP', False),( '17RKN', False),( '17RLM', False),( '17RLL', False),( '17RLK', False),( '17RLH', False),( '17RLP', False),( '17RLN', False),( '16RDV', False),( '16RDU', False),( '17RMM', False),( '17RML', False),( '17RMK', False),( '17RMJ', False),( '17RMH', False),( '17RMQ', False),( '17RMP', False),( '17RMN', False),( '16REV', False),( '16REU', False),( '17RNM', False),( '17RNL', False),( '17RNK', False),( '17RNJ', False),( '17RNH', False),( '17RNN', False),( '16RFV', False),( '16RFU', False),( '16RFT', False),( '16RGV', False),( '16RGU', False),( '16RGT', False)]
-        # c.stateDB.prio = 52
-        # c.stateDB.save()
-        # # gridlist = []
-        #c.IsClassificationFinished()
-        # c.countryDB.hasAllCorine = True
-        # c.Save()
-        # c.countryDB.shapefile = "GM"
-        # cell100Id =[4028, 4029, 4030, 4031, 4032, 4033, 4127, 4128, 4129, 4130, 4131, 4132, 4133, 4134, 4227, 4228, 4229, 4230, 4231, 4232, 4233, 4234, 4235, 4326, 4327, 4328, 4329, 4330, 4331, 4332, 4333, 4334, 4335, 4426, 4427, 4428, 4429, 4430, 4431, 4432, 4433, 4434, 4527, 4528, 4529, 4530, 4531, 4532, 4533, 4534, 4535, 4628, 4630, 4631, 4632, 4633, 4634];
-        # for g in c.countryDB.gridCells:
-        #        g[1] = False
-        # c.countryDB.gridCells = []
-        #c.countryDB.isFinished =
-        #c.Save()
-    # elif c.GetName() == "United Kingdom":
-    #     c.countryDB.delete()
     else:
         gridlist = []
         c.stateDB.prio = 52
@@ -179,10 +165,12 @@ scheduler = BlockingScheduler()
 scheduler.add_job(runNext, 'interval', hours=0.5)
 scheduler.start()
 
+
+#--------------- Fill up database ----------------------#
 # Creates an Asset for the country.
 def addNewState(name, prio):
     def createStateAsset(stateName):
-        assetName = ('users/emap1/Landcover-USA/' + stateName).replace(" ", "-")
+        assetName = (ASSETPATH_US + stateName).replace(" ", "-")
         try:
             trainingAssets = ee.data.listAssets(
                 {"parent": "projects/earthengine-legacy/assets/" + assetName})
@@ -204,62 +192,11 @@ def addNewState(name, prio):
     createStateAsset(name)
     print("state: {} added".format(name))
 
-# addNewState('Alabama', 4)
 # stateList = ['Alabama', 'Alaska', 'Arizona', 'Arkansas', 'California', 'Colorado', 'Connecticut', 'Delaware', 'Florida', 'Georgia', 'Hawaii', 'Idaho', 'Illinois', 'Indiana', 'Iowa', 'Kansas', 'Kentucky', 'Louisiana', 'Maine', 'Maryland', 'Massachusetts', 'Michigan', 'Minnesota', 'Mississippi', 'Missouri', 'Montana', 'Nebraska', 'Nevada', 'New Hampshire', 'New Jersey', 'New Mexico', 'New York', 'North Carolina', 'North Dakota', 'Ohio', 'Oklahoma', 'Oregon', 'Pennsylvania', 'Rhode Island', 'South Carolina', 'South Dakota', 'Tennessee', 'Texas', 'Utah', 'Vermont', 'Virginia', 'Washington', 'West Virginia', 'Wisconsin', 'Wyoming']
-# i = 4
 # for s in stateList:
-#     if s == 'California':
-#         addNewState(s, 2)
-#     elif s == 'Florida':
-#         addNewState(s, 1)
-#     elif s == 'Illinois':
-#         addNewState(s, 3)
-#     elif s == 'New York':
-#         addNewState(s, 0)
-#     else:
-#         addNewState(s, i)
-#         i = i+1
+#   addNewState(s, i)
+#   i = i+1
 
 
-
-def uploadCountryGrid(path):
-    return None
-
-#addNewCountry('Netherlands', 8)
-#addNewCountry('Sweden', 9)
-# addNewCountry('Italy', 7)
-# addNewCountry('Switzerland', 1)
-# addNewCountry('United Kingdom', 2)
-
-
-# class CountryDB(Document):
-#     name = StringField(required=True, max_length=200)
-#     shapefile = StringField(required=True)
-#     GridCells = StringField(required=True, max_length=50)
-#
-# print(CountryDB.objects[1].name)
-#uk_pages = CountryDB.objects(author__country='uk')
-
-# post_1 = CountryDB(
-#     name='Switzerland',
-#     shapefile='Switzerland',
-#     GridCells='t'
-# )
-# post_1.save()       # This will perform an insert
-# print(post_1.name)
-# client = MongoClient()
-# db = client['landcover']
-#
-# posts = db.posts
-# post_data = {
-#     'name': 'Germany',
-#     'shapefile': 'Germany',
-#     'GridCells': ''
-# }
-# result = posts.insert_one(post_data)
-# print('One post: {0}'.format(result.inserted_id))
-
-# bills_post = posts.find_one({'name': 'Germany'})
-# print(bills_post)
 
 logging.info("------   End    ------")
