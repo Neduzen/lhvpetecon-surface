@@ -9,7 +9,7 @@ class ImageExporter:
     def __init__(self):
         ee.Initialize()
 
-    # Launches the execution of
+    # Launches the execution of the image classification
     def RunImage(self, country, classifier, start_year, end_year):
         print("State image export of: {}".format(country.GetName()))
         self.start_year = start_year

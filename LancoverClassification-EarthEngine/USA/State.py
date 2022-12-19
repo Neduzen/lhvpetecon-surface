@@ -1,12 +1,10 @@
 import ee
-from ee import EEException
-from ee.batch import Export
 from mongoengine import *
-import DriveApi
-import logging
 from Constants import ASSETPATH_US
 from Constants import CLIMATESHAPE_US
 
+
+# US State local mongoDB object, containing the information needed to run the state.
 class StateDB(Document):
     name = StringField(required=True, max_length=200)
     shapefile = StringField(required=True)
@@ -17,6 +15,7 @@ class StateDB(Document):
     hasImages = BooleanField()
     trainSize = IntField(50,600)
 
+# State object containing the data to run the state.
 class State:
     def __init__(self, name, feature):
         self.name = name
@@ -25,43 +24,56 @@ class State:
     def __init__(self, stateDB):
         self.stateDB = stateDB
 
+    # Returns the state name
     def GetName(self):
         return self.stateDB.name
 
+    # Returns the state asset name in the earth engine platform
     def GetAssetName(self):
         return (ASSETPATH_US + self.GetName() + '/').replace(" ", "-")
 
+    # Returns the path of the grid asset name in GEE.
     def GetGridAssetName(self):
         return self.GetAssetName() + "GridState"
 
+    # Returns the training asset name in GEE.
     def GetTrainingAssetName(self):
         return self.GetAssetName() + "Training/"
 
+    # Returns the priority of execution.
     def GetPrio(self):
         return self.stateDB.prio
 
+    # Returns the size limit of training data.
+    # Corresponds to the amount of satelitte image per year per region which is considered.
+    # Done to not get computation error.
     def GetTrainSize(self):
         if self.stateDB.trainSize is None:
             self.stateDB.trainSize = 600
             self.Save()
         return self.stateDB.trainSize
 
+    # Decreases the training size limitation.
     def DecreaseTrainSize(self):
         self.stateDB.trainSize -= 20
         self.Save()
 
+    # Returns whether the state execution has already been started once.
     def hasStarted(self):
         return self.stateDB.hasStarted
 
+    # Returns whether the state is fully finished (all images exported).
     def hasFinished(self):
         return self.stateDB.isFinished
 
+    # Returns whether the state has already some images.
     def hasImages(self):
         if self.stateDB.hasImages is None:
             self.stateDB.hasImages = False
             self.Save()
         return self.stateDB.hasImages
 
+    # Returns the feature (shapefile) of the state in GEE.
     def GetFeature(self):
         # Get the german region in order to get trainings points within the countries' territory.
         region = ee.FeatureCollection('TIGER/2018/States').filter(ee.Filter.eq('NAME', self.stateDB.shapefile))
@@ -70,15 +82,11 @@ class State:
         else:
             raise Exception("State.GetFeature(): No Feature for the State was found: {}".format(self.GetName()))
 
+    # Returns the grids cells of the state.
     def GetGridCells(self):
         return self.stateDB.gridCells
 
-    def GetCrossValidation(self):
-        return False
-
-    def DoesCrossValidationExist(self):
-        return True
-
+    # Returns whether the grid cells exist or not.
     def DoGridCellsExist(self):
         gridCells = self.GetGridCells()
         if gridCells is None:
@@ -97,9 +105,11 @@ class State:
             return False
         return False
 
+    # Saves the state data in the mongoDB.
     def Save(self):
         self.stateDB.save()
 
+    # Calculates the percentage of climate zones within the state. Needed for the training data generation.
     def CalculateClimatePercentage(self):
         climateShape = ee.FeatureCollection(CLIMATESHAPE_US)
         stateShape = ee.Feature(self.GetFeature().first())

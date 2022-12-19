@@ -4,12 +4,11 @@ from ee.batch import Export
 from CorineImages import Corine
 from SatelliteImages import Satellite
 
+
+# Creates the training data for us states.
 class TrainingUSA:
     def __init__(self):
         ee.Initialize()
-
-    def ProduceTrainingData(self, region, trainyear, testPoints, assetName, sampleNumber):
-        self.ProduceTrainingDataEU()
 
     # Generates a satellite image of region of the given year and gets the corine landcover for this year.
     # Generates 1000 sample points for each class divide into the percentage of the climate classes
@@ -155,6 +154,9 @@ class TrainingUSA:
         return data
 
 
+    # Generates a satellite image of region of the given year and gets the corine landcover for this year.
+    # Generates a number of sample points for each class and exports their bands values to a csv document.
+    # This document can then be used from the Main program to training the classifier.
     def RunTrainingDataClimate(self, region, trainyear, testPoints, assetName, sampleNumber, imageLimit):
         print("Corine Training of year: {} and for asset {}".format(trainyear, assetName))
         # Get the corine landcover data for the training year.
@@ -180,15 +182,8 @@ class TrainingUSA:
             img = img.set("orderRC", ee.Number(img.get('CLOUD_COVER_LAND')).multiply(random.random()))
             return img
         comp = comp.map(orderColumn)
-        # imageLimit = 450
-        # if tryNumber == 1:
-        #     imageLimit = 430
-        # elif tryNumber == 2:
-        #     imageLimit = 377
-        # elif tryNumber == 3:
-        #     imageLimit = 342
-        # elif tryNumber == 4:
-        #     imageLimit = 300
+
+        # Limit satelite image to not get computation error
         comp = comp.sort('orderRC').limit(imageLimit)
         print("total size {} limit to {}".format(totalSize, comp.size().getInfo()))
 
@@ -223,80 +218,6 @@ class TrainingUSA:
 
         # In order to differentiate between testing and real run. Testing has certain sample points.
         data = ee.FeatureCollection(ee.Algorithms.If(testPoints, trainingDataCV, trainingData))
-
-        # Returns the training data
-        return data
-
-    # Generates a satellite image of region of the given year and gets the corine landcover for this year.
-    # Takes 1000 sample points for each class and exports their bands values to a csv document.
-    # This document can then be used from the Main program to training the classifier.
-    def ProduceTrainingDataEU(self, region, trainyear, testPoints, assetName, sampleNumber):
-        print("Corine Training of year: {} and for asset {}".format(trainyear, assetName))
-        # Get the corine landcover data for the training year.
-        corine = Corine().getCorineImages().clip(region.geometry())
-        landcover = corine.select(ee.Number(trainyear).format("%4d")).rename('landcover')
-
-        # Compute standard deviation (SD) of the corine classification, in order to exclude the class border,
-        # because there is high probability for wrong corine class. 100 meter border region.
-        texture = landcover.reduceNeighborhood(reducer=ee.Reducer.stdDev(), kernel=ee.Kernel.cross(100, "meters"))
-        texture = texture.eq(0)
-        texture = texture.updateMask(texture)
-        landcover = landcover.updateMask(texture)
-
-        bandNamesToTrain = ee.List(['blue', 'green', 'red', 'nir', 'swir1', 'swir2', 'NDVI', 'NDBI', 'WI'])
-
-        # Get Landsat composite for the training year.
-        satellite = Satellite()
-        comp = ee.ImageCollection(satellite.GetSatelliteImages(trainyear, trainyear, region))
-
-        # Limit amount of images, otherwise exceeds the server
-        print(comp.size().getInfo())
-        #comp = comp.sort('CLOUD_COVER_LAND').limit(450)
-        comp = comp.limit(450)
-        print(comp.size().getInfo())
-
-        # Calculate difference to mean brightness
-        mean = comp.select('brightness').mean()
-        def addMSD(img):
-            return img.addBands(mean.subtract(img.select('brightness')).pow(2).multiply(-1).rename('MSD'))
-        comp = comp.map(addMSD)
-
-        # Generate greenest pixel image (Highest NDVI values).
-        col = comp.qualityMosaic('NDVI')
-
-        # Second best pixel image with least difference to mean brightness
-        brightnessCol = comp.qualityMosaic('MSD')
-
-        # If Pixel is identified as bad, get the pixel with the least difference to the mean brightness
-        col = col.where(col.select('Bad').eq(1), brightnessCol)
-
-        # Get trainingsdata of the specific year for the given points.
-        trainingDataCV = col.select(bandNamesToTrain).sampleRegions(collection=testPoints, properties=['landcover'], scale=30)
-
-        # Get trainingsdata of the specific year of a stratified sample.
-        col = col.select(bandNamesToTrain).addBands(landcover).updateMask(texture)
-
-        trainingData = col.stratifiedSample(
-            numPoints=sampleNumber,
-            classBand="landcover",
-            region=region.geometry(),
-            scale=30,
-            seed=0,
-            geometries=True)
-
-        # In order to differentiate between testing and real run. Testing has certain sample points.
-        data = ee.FeatureCollection(ee.Algorithms.If(testPoints, trainingDataCV, trainingData))
-
-        if testPoints is None:
-            print("Export training data")
-            # Exports the data of all necessary bands for every data point.
-            name = 'train' + str(trainyear)
-            task = Export.table.toAsset(
-                collection=data,
-                description=name,
-                assetId=assetName + "Training/" + name)
-            task.start()
-            return task
 
         # Returns the training data
         return data

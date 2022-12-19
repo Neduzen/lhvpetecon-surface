@@ -6,6 +6,7 @@ from USA.ImageExporter import ImageExporter
 from USA.TrainingUSA import TrainingUSA
 
 
+# Class for automatic executing of the classification of the given US states.
 class ExecuterUSA:
     def __init__(self, states, startYear=1982, endYear=2021):
         ee.Initialize()
@@ -66,45 +67,43 @@ class ExecuterUSA:
 
             return False
 
-        # Create setup, if data not yet exist
-        doesTrainingsDataExist, trynumber = self.DoesTrainingDataExist(state)
-        if not doesTrainingsDataExist:
-            # Execute Training for classification, if data does not yet exist
-            self.RunTraining(state, trynumber)
-            return None
-
-        # Execute next step
-        if state is not None and state.hasStarted():
-            if len(state.GetGridCells()) == 0 or not state.DoGridCellsExist():
-                # Split grid cells if not existing
-                self.reportStep("Country: {}, split grid".format(state.GetName()))
-                cells = GridSplitter().SplitGrid(state.GetFeature(), state.GetGridAssetName())
-                state.stateDB.gridCells = cells
-                state.Save()
-                return None
-            else:
-                # Next classification tasks if no all finished
-                if not state.hasImages():
-                    imager = ImageExporter()
-                    retVal = imager.RunImage(state, self.GetTrainingsData(state), self.startYear, self.endYear)
-                    if retVal == 0:
-                        self.RunNextTask()
-                    return None
-                else:
-                    # Finish state
-                    self.reportStep("Country: {}, is finished".format(state.GetName()))
-                    state.stateDB.isFinished = True
-                    state.Save()
-                    self.RunNextTask()
-        else:
+        if state is None or state.hasStarted() is False:
             logging.WARNING("No state for next run found")
             raise Exception("NO state FOR NEXT RUN")
+
+        # Execute Training for classification, if data does not yet exist
+        if not self.DoesTrainingDataExist(state):
+            self.RunTraining(state)
+            return None
+
+        # Split state into grid cells if not existing
+        if len(state.GetGridCells()) == 0 or not state.DoGridCellsExist():
+            self.reportStep("Country: {}, split grid".format(state.GetName()))
+            cells = GridSplitter().SplitGrid(state.GetFeature(), state.GetGridAssetName())
+            state.stateDB.gridCells = cells
+            state.Save()
+            return None
+
+        # Classify next grid cell, if not all are finished
+        if not state.hasImages():
+            imager = ImageExporter()
+            retVal = imager.RunImage(state, self.GetTrainingsData(state), self.startYear, self.endYear)
+            if retVal == 0:
+                self.RunNextTask()
+            return None
+        # Finish state
+        else:
+            self.reportStep("Country: {}, is finished".format(state.GetName()))
+            state.stateDB.isFinished = True
+            state.Save()
+            self.RunNextTask()
+
         self.reportPendingTasks()
         print('END')
         return None
 
     # Run Training Data, export training values for the five reference years.
-    def RunTraining(self, state, tryNumber):
+    def RunTraining(self, state):
         size = state.GetTrainSize()
         b_perc, c_perc, d_perc, e_perc = state.CalculateClimatePercentage()
         trainingCorine = TrainingUSA()
@@ -115,12 +114,12 @@ class ExecuterUSA:
         trainingCorine.ProduceTrainingDataClimate(2018, None, state.GetAssetName(), b_perc, c_perc, d_perc, e_perc, size)
         state.DecreaseTrainSize()
 
-    # If all 5 training data files exist, return true.
+    # If all 6000 training sample points per year exist (total 30'000), return true.
     def DoesTrainingDataExist(self, state):
             trainingAssetPath = state.GetTrainingAssetName()
             trainingAssets = self.GetAssetList(trainingAssetPath)
             if not trainingAssets:
-                return False, 0
+                return False
             featureCol = None
             for a in trainingAssets["assets"]:
                 if featureCol is None:
@@ -128,26 +127,19 @@ class ExecuterUSA:
                 else:
                     featureCol = featureCol.merge(ee.FeatureCollection(a["id"]))
 
-            run = 0
             try:
                 trainingSize = featureCol.size().getInfo()
                 print("training data size: {}".format(trainingSize))
                 if trainingSize == 30000:
-                    return True, run
-                if trainingSize > 29000:
-                    run = 4
-                elif trainingSize > 27000:
-                    run = 3
-                elif trainingSize > 20000:
-                    run = 2
-                else:
-                    run = 1
+                    return True
+                    # All finished
                 print("Not all trainings exist. {}".format(trainingSize))
             except:
-                return False, run
-            return False, run
+                return False
+                print("Not all trainings exist. {}".format(trainingSize))
+            return False
 
-    # Gets the trainings data, if they exist, and returns classifier.
+    # Gets the trainings data, if they exist, and returns the classifier.
     def GetTrainingsData(self, state):
         trainingAssets = self.GetAssetList(state.GetTrainingAssetName())
         if not trainingAssets:
@@ -178,6 +170,7 @@ class ExecuterUSA:
                 return True
         return True
 
+    # Reports the amount of pending tasks
     def reportPendingTasks(self):
         tasks = ee.data.getTaskList()
         count = 0
@@ -186,10 +179,12 @@ class ExecuterUSA:
                 count += 1
         self.reportStep("{} tasks in progress".format(count))
 
+    # Reports a certain text
     def reportStep(self, text):
         print(text)
         logging.info(text)
 
+    # Reports the progress of the state.
     def reportProgress(self, state):
         # report state classification
         celln = 0

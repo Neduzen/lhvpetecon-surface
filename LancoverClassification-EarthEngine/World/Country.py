@@ -59,7 +59,9 @@ class Country:
             self.Save()
         return self.CountryWDB.hasImages
 
-    # Returns the training size.
+    # Returns the size limit of training data.
+    # Corresponds to the amount of satelitte image per year per region which is considered.
+    # Done to not get computation error.
     def GetTrainSize(self):
         if self.CountryWDB.trainSize is None:
             self.CountryWDB.trainSize = 600

@@ -36,8 +36,7 @@ class TrainingEurope:
 
         # Limit amount of images, otherwise exceeds the server
         print(comp.size().getInfo())
-        #comp = comp.sort('CLOUD_COVER_LAND').limit(450)
-        # Get 480 random Images if more are available
+        # Limit Images randomly if more are available
         comp = ee.ImageCollection(comp.randomColumn('random', 13).sort('random').limit(460))
         print(comp.size().getInfo())
 
