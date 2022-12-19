@@ -16,11 +16,16 @@ class GridSplitter:
             gridCells = manualGridCells
 
         polygonList = ee.List([])
+        gridCellFeatures = ee.FeatureCollection(ee.List([]))
         for g in gridCells:
-            cellfeat = self.createPolygon(g[0])
-            polygonList = polygonList.add(cellfeat)
+            #cellfeat = self.createPolygon(g[0])
+            newfeat = ee.FeatureCollection(self.createPolygon(g[0])).filterBounds(feature)
+            if len(newfeat.getInfo()['features'])>0:
+                gridCellFeatures = gridCellFeatures.merge(newfeat)
 
-        gridCellFeatures = ee.FeatureCollection(polygonList)
+            #polygonList = polygonList.add(cellfeat)
+
+        #gridCellFeatures = ee.FeatureCollection(polygonList)
 
         gridCellFeatures = gridCellFeatures.filterBounds(feature) # Exclude cells not in feature area
         gridCellFeatures = gridCellFeatures.distinct('CellID')  # Only one CellID, no duplicates
@@ -37,7 +42,8 @@ class GridSplitter:
         task = Export.table.toAsset(
             collection=gridCellFeatures,
             description="grid",
-            assetId=assetName)
+            assetId=assetName
+        )
         task.start()
 
         print("1'degree cells for country: {}".format(gridCells))

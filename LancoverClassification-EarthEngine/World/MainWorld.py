@@ -15,8 +15,8 @@ from World.Country import Country
 from World.ExecuterWorld import ExecuterWorld
 
 # SETUP PARAMETERS
-start_year = 2005
-end_year = 2021
+start_year = 1982
+end_year = 2022
 
 ee.Initialize()
 logging.basicConfig(filename='main.log', level=logging.INFO, format='%(asctime)s %(message)s')
@@ -24,8 +24,135 @@ logging.info("------   Start    ------")
 #client = MongoClient()
 connect('landcover-World', host='localhost', port=27017)
 
+# Creates an Asset for the country.
+def addNewCountry(name, prio, manualGridCell = []):
+    def createStateAsset(countryName):
+        assetName = ('users/emap1/Landcover-World/' + countryName).replace(" ", "-")
+        try:
+            trainingAssets = ee.data.listAssets(
+                {"parent": "projects/earthengine-legacy/assets/" + assetName})
+        except EEException:
+            # If asset does not exist, create one
+            ee.data.createAsset({'type': 'Folder'}, assetName)
+            ee.data.createAsset({'type': 'Folder'}, assetName + "/Training")
+        return None
+
+    post_1 = CountryWDB(
+        name=name,
+        shapefile=name,
+        gridCells=manualGridCell,
+        prio=prio,
+        hasManualGridCells= (len(manualGridCell)>0),
+        hasStarted=False,
+        isFinished=False,
+    )
+    post_1.save()       # This will perform an insert
+    createStateAsset(name)
+    print("country: {} added".format(name))
+
+#addNewCountry("Chad", 0)
+#addNewCountry("Botswana", 0)
+#addNewCountry("Namibia", 0)
+#addNewCountry("South Africa", 0)
+#addNewCountry("Swaziland", 0)
+#addNewCountry("Mayotte", 0)
+#addNewCountry("Niger", 0)
+#addNewCountry("Sudan", 0)
+#addNewCountry("Libya", 0)
+#addNewCountry("Koualou Area", 0)
+#addNewCountry("Tunisia", 0)
+#addNewCountry("Egypt", 0)
+#addNewCountry("Bir Tawil", 0)
+#addNewCountry("Halaib Triangle", 0)
+#addNewCountry("Eritrea", 0)
+#addNewCountry("Djibouti", 0)
+#addNewCountry("Somalia", 0)
+#addNewCountry("South Sudan", 0)
+#addNewCountry("Abyei Area", 0)
+#addNewCountry("Comoros", 0)
+#addNewCountry("Madagascar", 0)
+#addNewCountry("Cabo Verde", 0)
+#addNewCountry("Western Sahara", 0)
+#addNewCountry("Mauritania", 0)
+#addNewCountry("Morocco", 0)
+#addNewCountry("Mali", 0)
+#addNewCountry("Cote d’Ivoire", 0)
+#addNewCountry("Guinea-Bissau", 0)
+#addNewCountry("Liberia", 0)
+#addNewCountry("Equatorial Guinea", 0)
+#addNewCountry("Sao Tome & Principe", 0)
+#addNewCountry("Gabon", 0)
+#addNewCountry("Rep of the Congo", 0)
+#addNewCountry("Central African Rep", 0)
+#addNewCountry("Dem Rep of the Congo", 0)
+
+#addNewCountry("Ukraine", 0)
+#addNewCountry("Moldova", 0)
+#addNewCountry("Belarus", 0)
+#addNewCountry("Afghanistan",1)
+#addNewCountry("Armenia",2)
+#addNewCountry("Azerbaijan",3)
+#addNewCountry("Georgia",4)
+#addNewCountry("Kazakhstan",5)
+#addNewCountry("Kyrgyzstan",6)
+#addNewCountry("Syria",7)
+#addNewCountry("Lebanon",8)
+#addNewCountry("Guinea", 1)
+#addNewCountry("Togo", 2)
+#addNewCountry("Uganda", 3)
+#addNewCountry("Zimbabwe", 4)
+#addNewCountry("Senegal", 0)
+#addNewCountry("Nepal", 0)
+#addNewCountry("Kenia", 0)
+#addNewCountry("Vietnam", 0)
+#addNewCountry("Argentina", 0)
+#addNewCountry("Nigeria", 0)
+#addNewCountry("Cambodia", 0)
+#addNewCountry("Mexico", 0)
+#addNewCountry("Algeria", 99)
+#addNewCountry("Thailand", 0)
+#addNewCountry("Uruguay", 0)
+#addNewCountry("Mali", 0)
+##addNewCountry("Gambia, The", 1)
+#addNewCountry("Sierra Leone", 1)
+#addNewCountry("Burkina Faso", 1)
+##addNewCountry("Côte d’Ivoire", 1)
+#addNewCountry("Ghana", 0)
+#addNewCountry("Benin", 0)
+#addNewCountry("Nigeria", 0)
+#addNewCountry("Cameroon", 0)
+##addNewCountry("Congo (Kinshasa)", 1)
+#addNewCountry("Angola", 0)
+#addNewCountry("Ethiopia", 0)
+#addNewCountry("Rwanda", 0)
+#addNewCountry("Tanzania", 0)
+#addNewCountry("Zambia", 0)
+#addNewCountry("Burundi", 0)
+#addNewCountry("Malawi", 0)
+#addNewCountry("Mozambique", 0)
+#addNewCountry("Lesotho", 0)
+#addNewCountry("Eswatini", 0)
+#addNewCountry("Kenya", 2)
+#addNewCountry("Qatar", 0)
+#addNewCountry("Malaysia", 0)
+#addNewCountry("Singapore", 0)
+#addNewCountry("Japan", 0)
+#addNewCountry("Oman", 0)
+#addNewCountry("Bahrain", 2)
+#addNewCountry("Kuwait", 2)
+#addNewCountry("Yemen", 2)
+#addNewCountry("Jordan", 2)
+#addNewCountry("Iraq", 0)
+#addNewCountry("Iran", 2)
+#addNewCountry("Venezuela", 2)
+#addNewCountry("Panama", 2)
+#addNewCountry("Cuba", 2)
+#addNewCountry("Haiti", 1)
+
+
 countries = []
 
+print(CountryWDB)
 for obj in CountryWDB.objects:
     countries.append(Country(obj))
 
@@ -101,17 +228,43 @@ for c in countries:
         #     gc = (gc[0], False)
         # print(c.GetGridCells())
         c.Save()
+    elif c.GetName() == "Yemen":
+        c.CountryWDB.prio = 1
+    elif c.GetName() == "Syria":
+        #c.CountryWDB.prio = 99
+        c.Save()
+    elif c.GetName() == "Burkina Faso":
+        c.CountryWDB.prio = 2
+        c.Save()
+    elif c.GetName() == "Argentina" or c.GetName() == "Cambodia" or c.GetName() == "Mexico":
+        #c.CountryWDB.prio = 3
+        c.Save()
+    elif c.GetName() == "South Africa":
+        c.CountryWDB.prio = 2
+        c.Save()
+    elif c.GetName() == "Japan":
+        c.CountryWDB.prio = 2
+        c.Save()
+    elif c.GetName() == "Kazakhstan":
+        c.CountryWDB.prio = 99
+        #c.CountryWDB.prio = 99
+        c.Save()
+    elif c.GetName() == "Gambia":
+        c.CountryWDB.prio = 0
+        # c.CountryWDB.prio = 99
+        c.Save()
     print("- {}, prio:{} has started {}, has finished {}".format(c.GetName(), c.GetPrio(), c.hasStarted(), c.hasFinished()))
 
+print(countries)
 
 def printProgress(countries):
-    print("Fully executed states:")
+    print("Fully executed countries:")
     count = 0
     for c in countries:
         if c.hasFinished() and c.hasImages():
             count += 1
             print(c.GetName())
-    print("{} of 51 countries finished".format(count))
+    print("{} countries finished".format(count))
 
 printProgress(countries)
 
@@ -125,39 +278,10 @@ def runNext():
 
 print("Set scheduler")
 scheduler = BlockingScheduler()
-scheduler.add_job(runNext, 'interval', hours=0.5)
+scheduler.add_job(runNext, 'interval', hours=0.2)
 scheduler.start()
 
-# Creates an Asset for the country.
-def addNewCountry(name, prio, manualGridCell = []):
-    def createStateAsset(countryName):
-        assetName = ('users/emap1/Landcover-World/' + countryName).replace(" ", "-")
-        try:
-            trainingAssets = ee.data.listAssets(
-                {"parent": "projects/earthengine-legacy/assets/" + assetName})
-        except EEException:
-            # If asset does not exist, create one
-            ee.data.createAsset({'type': 'Folder'}, assetName)
-            ee.data.createAsset({'type': 'Folder'}, assetName + "/Training")
-        return None
 
-    post_1 = CountryWDB(
-        name=name,
-        shapefile=name,
-        gridCells=manualGridCell,
-        prio=prio,
-        hasManualGridCells= (len(manualGridCell)>0),
-        hasStarted=False,
-        isFinished=False,
-    )
-    post_1.save()       # This will perform an insert
-    createStateAsset(name)
-    print("state: {} added".format(name))
-
-#addNewCountry("Guinea", 1)
-#addNewCountry("Togo", 2)
-#addNewCountry("Uganda", 3)
-#addNewCountry("Zimbabwe", 4)
 #addNewCountry('Brasil', 1, ["Long-52-Lat-23", "Long-51-Lat-23", "Long-52-Lat-24", "Long-51-Lat-24"])
 # stateList = ['Alabama', 'Alaska', 'Arizona', 'Arkansas', 'California', 'Colorado', 'Connecticut', 'Delaware', 'Florida', 'Georgia', 'Hawaii', 'Idaho', 'Illinois', 'Indiana', 'Iowa', 'Kansas', 'Kentucky', 'Louisiana', 'Maine', 'Maryland', 'Massachusetts', 'Michigan', 'Minnesota', 'Mississippi', 'Missouri', 'Montana', 'Nebraska', 'Nevada', 'New Hampshire', 'New Jersey', 'New Mexico', 'New York', 'North Carolina', 'North Dakota', 'Ohio', 'Oklahoma', 'Oregon', 'Pennsylvania', 'Rhode Island', 'South Carolina', 'South Dakota', 'Tennessee', 'Texas', 'Utah', 'Vermont', 'Virginia', 'Washington', 'West Virginia', 'Wisconsin', 'Wyoming']
 # i = 4

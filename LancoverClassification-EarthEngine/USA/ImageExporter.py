@@ -46,7 +46,7 @@ class ImageExporter:
             latitudeRegion = "South"
 
         # Get grid cell and export it
-        smallGrid = ee.FeatureCollection(self.state.GetAssetName() + 'GridState')
+        smallGrid = ee.FeatureCollection(self.state.GetGridAssetName())
         smallGrid = smallGrid.distinct('CellID')
         smallGrid = smallGrid.filter(ee.Filter.eq("CellID", cell))
         imageCollection = classify.DoClassification(smallGrid, self.classifier, cell, 'CellID', self.start_year,

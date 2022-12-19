@@ -15,7 +15,7 @@ class TrainingUSA:
     # Generates 1000 sample points for each class divide into the percentage of the climate classes
     # and exports their bands values to a csv document.
     # This document can then be used from the Main program to training the classifier.
-    def ProduceTrainingDataClimate(self, year, testPoints, assetName, b_perc, c_perc, d_perc, e_perc, trynumber):
+    def ProduceTrainingDataClimate(self, year, testPoints, assetName, b_perc, c_perc, d_perc, e_perc, imageLimit):
         # Total 1000, divide into categories based on input percentage
         b1co = ee.FeatureCollection('users/emap1/climateShapeB1-eu')
         b2co = ee.FeatureCollection('users/emap1/climateShapeB2-eu')
@@ -70,25 +70,32 @@ class TrainingUSA:
             d = ds[0]+ds[1]+ds[2]+ds[3]+ds[4]
             e = es[0]+es[1]+es[2]
 
+            # Adapt if rounding error and not 1000 trainings pixel
             tot = b + c + d + e
             if tot > 1000:
+                minus = 1
+                if tot == 1002:
+                    minus = 2
                 if e_perc > b_perc and e_perc > c_perc and e_perc > d_perc:
-                    es[0] -= 1
+                    es[0] -= minus
                 elif b_perc > c_perc and b_perc > d_perc and b_perc > e_perc:
-                    bs[0] -= 1
+                    bs[0] -= minus
                 elif c_perc > b_perc and c_perc > d_perc and c_perc > e_perc:
-                    cs[0] -= 1
+                    cs[0] -= minus
                 elif d_perc > c_perc and d_perc > b_perc and d_perc > e_perc:
-                    ds[0] -= 1
+                    ds[0] -= minus
             elif tot < 1000:
+                plus = 1
+                if tot == 998:
+                    plus = 2
                 if e_perc > b_perc and e_perc > c_perc and e_perc > d_perc:
-                    es[0] += 1
+                    es[0] += plus
                 elif b_perc > c_perc and b_perc > d_perc and b_perc > e_perc:
-                    bs[0] += 1
+                    bs[0] += plus
                 elif c_perc > b_perc and c_perc > d_perc and c_perc > e_perc:
-                    cs[0] += 1
+                    cs[0] += plus
                 elif d_perc > c_perc and d_perc > b_perc and d_perc > e_perc:
-                    ds[0] += 1
+                    ds[0] += plus
 
             b = bs[0]+bs[1]+bs[2]
             c = cs[0]+cs[1]+cs[2]+cs[3]+cs[4]
@@ -97,10 +104,10 @@ class TrainingUSA:
             tot = b + c + d + e
             if tot != 1000:
                 print("Wrong amount of training points: {}, expected 1000".format(tot))
-            print("Training points b: {}".format(bs))
-            print("Training points c: {}".format(cs))
-            print("Training points d: {}".format(ds))
-            print("Training points e: {}".format(es))
+                print("Training points b: {}".format(bs))
+                print("Training points c: {}".format(cs))
+                print("Training points d: {}".format(ds))
+                print("Training points e: {}".format(es))
             return bs,cs,ds,es
 
         # B1: 86k, B2: 227k, B3:185k, tot: 498k # C1: 318k, C2: 586, C3: 424k, C4: 324k, C5: 471k, tot: 2123k
@@ -120,7 +127,7 @@ class TrainingUSA:
 
         def runSubClass(region, number, name, data):#, data=None):
             if number > 0:
-                data1 = self.RunTrainingDataClimate(region, year, testPoints, assetName, number, trynumber)
+                data1 = self.RunTrainingDataClimate(region, year, testPoints, assetName, number, imageLimit)
                 exportAsset(year, data1, "-"+name)
                 if data is None and testPoints is None:
                     data = data1
@@ -148,7 +155,7 @@ class TrainingUSA:
         return data
 
 
-    def RunTrainingDataClimate(self, region, trainyear, testPoints, assetName, sampleNumber, tryNumber):
+    def RunTrainingDataClimate(self, region, trainyear, testPoints, assetName, sampleNumber, imageLimit):
         print("Corine Training of year: {} and for asset {}".format(trainyear, assetName))
         # Get the corine landcover data for the training year.
         corine = Corine().getCorineImages().clip(region.geometry())
@@ -173,15 +180,15 @@ class TrainingUSA:
             img = img.set("orderRC", ee.Number(img.get('CLOUD_COVER_LAND')).multiply(random.random()))
             return img
         comp = comp.map(orderColumn)
-        imageLimit = 450
-        if tryNumber == 1:
-            imageLimit = 430
-        elif tryNumber == 2:
-            imageLimit = 400
-        elif tryNumber == 3:
-            imageLimit = 360
-        elif tryNumber == 4:
-            imageLimit = 320
+        # imageLimit = 450
+        # if tryNumber == 1:
+        #     imageLimit = 430
+        # elif tryNumber == 2:
+        #     imageLimit = 377
+        # elif tryNumber == 3:
+        #     imageLimit = 342
+        # elif tryNumber == 4:
+        #     imageLimit = 300
         comp = comp.sort('orderRC').limit(imageLimit)
         print("total size {} limit to {}".format(totalSize, comp.size().getInfo()))
 

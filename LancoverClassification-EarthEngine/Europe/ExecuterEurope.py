@@ -51,7 +51,7 @@ class ExecuterEurope:
                 if len(country.GetGridCells()) == 0 or not country.DoGridCellsExist():
                     # Split grid cells if not existing
                     self.reportStep("Country: {}, split grid".format(country.GetName()))
-                    cells = GridSplitter().SplitGrid(country.GetFeature(), country.GetAssetName())
+                    cells = GridSplitter().SplitGrid(country.GetFeature(), country.GetGridName())
                     country.countryDB.gridCells = cells
                     country.Save()
                     return None

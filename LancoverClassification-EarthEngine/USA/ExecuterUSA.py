@@ -53,6 +53,8 @@ class ExecuterUSA:
         else:
             self.reportStep('No actual state found.')
 
+        self.reportProgress(state)
+
         # Wait, if tasks are still pending
         if not self.AreTasksFinished():
             # Tasks are still in progress, sleep (nothing to do)
@@ -61,15 +63,6 @@ class ExecuterUSA:
                 name = state.GetName()
             self.reportStep("State: {}, tasks still pending, ... Wait".format(name))
             self.reportPendingTasks()
-
-            # report state classification
-            celln = 0
-            truen = 0
-            for cell in state.GetGridCells():
-                celln += 1
-                if cell[1] is True:
-                    truen += 1
-            print("{} of {} finished".format(truen, celln))
 
             return False
 
@@ -93,7 +86,7 @@ class ExecuterUSA:
                 # Next classification tasks if no all finished
                 if not state.hasImages():
                     imager = ImageExporter()
-                    retVal = imager.RunImage(state, self.GetTrainingsData(True, state), self.startYear, self.endYear)
+                    retVal = imager.RunImage(state, self.GetTrainingsData(state), self.startYear, self.endYear)
                     if retVal == 0:
                         self.RunNextTask()
                     return None
@@ -112,13 +105,15 @@ class ExecuterUSA:
 
     # Run Training Data, export training values for the five reference years.
     def RunTraining(self, state, tryNumber):
+        size = state.GetTrainSize()
         b_perc, c_perc, d_perc, e_perc = state.CalculateClimatePercentage()
         trainingCorine = TrainingUSA()
-        trainingCorine.ProduceTrainingDataClimate(1990, None, state.GetAssetName(), b_perc, c_perc, d_perc, e_perc, tryNumber)
-        trainingCorine.ProduceTrainingDataClimate(2000, None, state.GetAssetName(), b_perc, c_perc, d_perc, e_perc, tryNumber)
-        trainingCorine.ProduceTrainingDataClimate(2006, None, state.GetAssetName(), b_perc, c_perc, d_perc, e_perc, tryNumber)
-        trainingCorine.ProduceTrainingDataClimate(2012, None, state.GetAssetName(), b_perc, c_perc, d_perc, e_perc, tryNumber)
-        trainingCorine.ProduceTrainingDataClimate(2018, None, state.GetAssetName(), b_perc, c_perc, d_perc, e_perc, tryNumber)
+        trainingCorine.ProduceTrainingDataClimate(1990, None, state.GetAssetName(), b_perc, c_perc, d_perc, e_perc, size)
+        trainingCorine.ProduceTrainingDataClimate(2000, None, state.GetAssetName(), b_perc, c_perc, d_perc, e_perc, size)
+        trainingCorine.ProduceTrainingDataClimate(2006, None, state.GetAssetName(), b_perc, c_perc, d_perc, e_perc, size)
+        trainingCorine.ProduceTrainingDataClimate(2012, None, state.GetAssetName(), b_perc, c_perc, d_perc, e_perc, size)
+        trainingCorine.ProduceTrainingDataClimate(2018, None, state.GetAssetName(), b_perc, c_perc, d_perc, e_perc, size)
+        state.DecreaseTrainSize()
 
     # If all 5 training data files exist, return true.
     def DoesTrainingDataExist(self, state):
@@ -153,7 +148,7 @@ class ExecuterUSA:
             return False, run
 
     # Gets the trainings data, if they exist, and returns classifier.
-    def GetTrainingsData(self, newTraining, state):
+    def GetTrainingsData(self, state):
         trainingAssets = self.GetAssetList(state.GetTrainingAssetName())
         if not trainingAssets:
             print("no training data available, stop")
@@ -194,3 +189,13 @@ class ExecuterUSA:
     def reportStep(self, text):
         print(text)
         logging.info(text)
+
+    def reportProgress(self, state):
+        # report state classification
+        celln = 0
+        truen = 0
+        for cell in state.GetGridCells():
+            celln += 1
+            if cell[1] is True:
+                truen += 1
+        print("{} of {} finished".format(truen, celln))

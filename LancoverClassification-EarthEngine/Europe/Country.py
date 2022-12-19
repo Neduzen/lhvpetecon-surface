@@ -31,7 +31,7 @@ class Country:
         return (ASSETPATH_EU + self.GetName() + '/').replace(" ", "-")
 
     def GetGridAssetName(self):
-        return self.GetAssetName() + "Grid"
+        return self.GetAssetName() + "GridState"
 
     def GetPrio(self):
         return self.countryDB.prio

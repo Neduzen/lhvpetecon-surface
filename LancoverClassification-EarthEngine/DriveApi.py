@@ -89,7 +89,7 @@ def CheckCrossValidationData(countryName, hasAllCorine):
             return False
 
 # Returns list of filenames and grid cells which are not yet executed
-def CheckImageProgress(countryName, gridCells, yearFrom=1984, yearTo=2021, fails=4):
+def CheckImageProgress(countryName, gridCells, yearFrom=1982, yearTo=2022, fails=20):
     folderpart = "-Image"
     creds = Initialize()
     service = build('drive', 'v3', credentials=creds)

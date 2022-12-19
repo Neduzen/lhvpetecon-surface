@@ -13,7 +13,7 @@ from Constants import ASSETPATH_US
 
 ################################################################
 # SETUP PARAMETERS
-start_year = 2005
+start_year = 1983
 end_year = 2021
 ################################################################
 
@@ -71,24 +71,45 @@ for c in states:
         c.stateDB.prio = 12
     elif c.GetName() == 'Connecticut':
         c.stateDB.prio = 4
+        c.stateDB.hasStarted = True
+        c.stateDB.hasImages = True
+        c.stateDB.isFinished = True
     elif c.GetName() == 'Pennsylvania':
         c.stateDB.prio = 5
+        c.stateDB.hasStarted = True
+        c.stateDB.hasImages = True
+        c.stateDB.isFinished = True
+    elif c.GetName() == 'Tennessee2':
+        c.stateDB.hasStarted = True
+        c.stateDB.hasImages = True
+        c.stateDB.isFinished = True
+        c.Save()
     elif c.GetName() == 'New Jersey':
         c.stateDB.prio = 6
+        c.stateDB.hasStarted = True
+        c.stateDB.hasImages = True
+        c.stateDB.isFinished = True
     elif c.GetName() == 'Illinois':
         c.stateDB.prio = 7
+        c.stateDB.hasStarted = True
+        c.stateDB.hasImages = True
+        c.stateDB.isFinished = True
     elif c.GetName() == 'North Carolina':
         c.stateDB.prio = 8
     elif c.GetName() == 'Maryland':
         c.stateDB.prio = 9
     elif c.GetName() == 'Tennessee':
         c.stateDB.prio = 1
+        c.stateDB.hasStarted = True
+        c.stateDB.hasImages = True
+        c.stateDB.isFinished = True
     elif c.GetName() == 'Ohio':
         c.stateDB.prio = 10
     elif c.GetName() == 'Utah':
         c.stateDB.prio = 11
     elif c.GetName() == 'Texas':
         c.stateDB.prio = 0
+        c.stateDB.hasStarted = True
         c.stateDB.hasImages = True
         c.stateDB.isFinished = True
         c.Save()
@@ -129,11 +150,15 @@ for c in states:
     elif c.GetName() == 'Kentucky':
         c.stateDB.prio = 29
     elif c.GetName() == 'Hawaii':
-        c.stateDB.prio = 51
+        c.stateDB.prio = 60
     elif c.stateDB.prio <= 29:
         c.stateDB.prio = 30
     elif c.stateDB.name == "Alaska":
-        c.stateDB.isFinished = True
+        c.stateDB.isFinished = False
+        c.stateDB.prio = 0
+        c.stateDB.hasStarted = False
+        c.stateDB.hasImages = False
+        c.Save()
     else:
         gridlist = []
         c.stateDB.prio = 52
@@ -162,7 +187,8 @@ def runNext():
     print("Tasks scheduled. Sleep ...")
 
 scheduler = BlockingScheduler()
-scheduler.add_job(runNext, 'interval', hours=0.5)
+scheduler.add_job(runNext, 'interval', hours=0.15)
+print("Sleep")
 scheduler.start()
 
 
@@ -196,6 +222,11 @@ def addNewState(name, prio):
 # for s in stateList:
 #   addNewState(s, i)
 #   i = i+1
+list=[('Alaska', 52), ('Arizona', 14), ('Arkansas', 24), ('California', 2), ('Colorado', 13), ('Connecticut', 4), ('Delaware', 52), ('Florida', 8), ('Georgia', 21), ('Hawaii', 51), ('Idaho', 52), ('Illinois', 7), ('Indiana', 17), ('Iowa', 52), ('Kansas', 20), ('Kentucky', 29), ('Louisiana', 23), ('Maine', 52), ('Maryland', 9), ('Massachusetts', 12), ('Michigan', 11), ('Minnesota', 18), ('Mississippi', 25), ('Missouri', 19), ('Montana', 52), ('Nebraska', 52), ('Nevada', 52), ('New Hampshire', 52), ('New Jersey', 6), ('New Mexico', 52), ('New York', 3), ('North Carolina', 8), ('North Dakota', 52), ('Ohio', 10), ('Oklahoma', 52), ('Oregon', 52), ('Pennsylvania', 5), ('Rhode Island', 52), ('South Carolina', 28), ('South Dakota', 52), ('Tennessee', 1), ('Texas', 0), ('Utah', 11), ('Vermont', 52), ('Virginia', 15), ('Washington', 52), ('West Virginia', 26), ('Wisconsin', 16), ('Wyoming', 52), ('Alabama', 22)]
+for i in list:
+    i
+    #addNewState(i[0],i[1])
+
 
 
 

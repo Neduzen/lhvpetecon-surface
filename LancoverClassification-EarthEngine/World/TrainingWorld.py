@@ -4,18 +4,17 @@ from ee.batch import Export
 from CorineImages import Corine
 from SatelliteImages import Satellite
 
+
+# Creates the training data for a given region (country).
 class TrainingWorld:
     def __init__(self):
         ee.Initialize()
-
-    def ProduceTrainingData(self, region, trainyear, testPoints, assetName, sampleNumber):
-        self.ProduceTrainingDataEU()
 
     # Generates a satellite image of region of the given year and gets the corine landcover for this year.
     # Generates 1000 sample points for each class divide into the percentage of the climate classes
     # and exports their bands values to a csv document.
     # This document can then be used from the Main program to training the classifier.
-    def ProduceTrainingDataClimate(self, year, testPoints, assetName, b_perc, c_perc, d_perc, e_perc, trynumber, trainingAssets):
+    def ProduceTrainingDataClimate(self, year, testPoints, assetName, b_perc, c_perc, d_perc, e_perc, imageLimit, trainingAssets):
         # Total 1000, divide into categories based on input percentage
         b1co = ee.FeatureCollection('users/emap1/climateShapeB1-eu')
         b2co = ee.FeatureCollection('users/emap1/climateShapeB2-eu')
@@ -41,6 +40,7 @@ class TrainingWorld:
         for a in trainingAssets["assets"]:
             trainingAssetsNames.append(a["id"])
 
+        # Exports the training data to GEE.
         def exportAsset(year, data, nameExtension):
             name = 'train' + str(year) + nameExtension
             assetId = assetName + "Training/" + name
@@ -54,6 +54,7 @@ class TrainingWorld:
                 task.start()
                 return task
 
+        # Determines the amount of sample points per climate class based on the climate zone area distribution.
         def defineNumberOfPoints(b, c, d, e):
             b_tot = b[0]+b[1]+b[2]
             c_tot = c[0]+c[1]+c[2]+c[3]+c[4]+c[5]+c[6]
@@ -115,26 +116,28 @@ class TrainingWorld:
             print("Training points e: {}".format(es))
             return bs,cs,ds,es
 
-        # B1: 86k, B2: 227k, B3:185k, tot: 498k
-        # C1: 318k, C2: 586, C3: 424k, C41: 194, C42: 130, C5_1: 249k, C5_2: 222, tot: 2123k
-        # D1: 387k, D2: 1065k, D3: 736k, D4: 424k, D5_1: 193k, D5_2:112k, tot: 2917k
-        # E1: 95k, E2: 91k, E3: 32k, tot: 218k
+        # Corine landcover (2000, 2006, 2012, 2018) cells divided into climate zones.
+        # B: 498k, C: 2123k,  D: 2917k, E: 218k.
+        # List shows the divide number (as the area had to be split to not get computation overflow)
         b = [86, 227, 185]
         c = [318, 586, 424, 194, 130, 249, 222]
         d = [387, 1065, 736, 424, 193, 112]
         e = [95, 91, 32]
         if year == 1990:
-            # 1990
+            # Not all countries had already 1990 corine coverage, thus, different climate number for the year of 1990
             # only e1, d2 not, d3-60k, d1-25k, c1 (only ireland) 74k instead of 318, c3-29k
             b = [86, 227, 185]
             c = [74, 586, 395, 194, 130, 249, 222]
             d = [362, 0, 676, 424, 193, 112]
             e = [0, 0, 32]
+        # Calculate the number of training points per climate zones based on the countries climate zones.
         bs, cs, ds, es = defineNumberOfPoints(b, c, d, e)
 
+        # Generates the training data for a given climate zone of a subset shape feature.
         def runSubClass(region, number, name, data):
             if number > 0:
-                data1 = self.RunTrainingDataClimate(region, year, testPoints, assetName, number, trynumber)
+                # Run training data for the climate area of a specific year
+                data1 = self.RunTrainingDataClimate(region, year, testPoints, assetName, number, imageLimit)
                 exportAsset(year, data1, "-"+name)
                 if data is None and testPoints is None:
                     data = data1
@@ -142,6 +145,7 @@ class TrainingWorld:
                     data = data.merge(data1)
             return data
 
+        # Run all training data
         data = runSubClass(b1co, bs[0], "b1", None)
         data = runSubClass(b2co, bs[1], "b2", data)
         data = runSubClass(b3co, bs[2], "b3", data)
@@ -164,8 +168,8 @@ class TrainingWorld:
 
         return data
 
-
-    def RunTrainingDataClimate(self, region, trainyear, testPoints, assetName, sampleNumber, tryNumber):
+    # Generates the training data of a climate subarea for a specific year with the defined number of sample points.
+    def RunTrainingDataClimate(self, region, trainyear, testPoints, assetName, sampleNumber, imageLimit):
         print("Corine Training of year: {} and for asset {}".format(trainyear, assetName))
         # Get the corine landcover data for the training year.
         corine = Corine().getCorineImages().clip(region.geometry())
@@ -190,19 +194,8 @@ class TrainingWorld:
             img = img.set("orderRC", ee.Number(img.get('CLOUD_COVER_LAND')).multiply(random.random()))
             return img
         comp = comp.map(orderColumn)
-        imageLimit = 450
-        if tryNumber == 1:
-            imageLimit = 430
-        elif tryNumber == 2:
-            imageLimit = 400
-        elif tryNumber == 3:
-            imageLimit = 370
-        elif tryNumber == 4:
-            imageLimit = 340
-        elif tryNumber == 5:
-            imageLimit = 320
-        elif tryNumber == 6:
-            imageLimit = 300
+
+        # Limit the number of images to avoid computation error
         comp = comp.sort('orderRC').limit(imageLimit)
         print("total size {} limit to {}".format(totalSize, comp.size().getInfo()))
 
@@ -218,15 +211,16 @@ class TrainingWorld:
         # Second best pixel image with least difference to mean brightness
         brightnessCol = comp.qualityMosaic('MSD')
 
-        # If Pixel is identified as bad, get the pixel with the least difference to the mean brightness
+        # If a pixel is identified as bad, get the pixel with the least difference to the mean brightness
         col = col.where(col.select('Bad').eq(1), brightnessCol)
 
-        # Get trainingsdata of the specific year for the given points.
+        # Get training data of the specific year for the given points.
         trainingDataCV = col.select(bandNamesToTrain).sampleRegions(collection=testPoints, properties=['landcover'], scale=30)
 
-        # Get trainingsdata of the specific year of a stratified sample.
+        # Get training data of the specific year of a stratified sample.
         col = col.select(bandNamesToTrain).addBands(landcover).updateMask(texture)
 
+        # Generate a stratified sample with a given number of datapoints per classification category.
         trainingData = col.stratifiedSample(
             numPoints=sampleNumber,
             classBand="landcover",

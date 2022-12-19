@@ -1,11 +1,12 @@
 import ee
 from ee import EEException
-from ee.batch import Export
 from mongoengine import *
 import DriveApi
 from Constants import *
 
 
+# Contains the country information locally.
+# Information about the execution progress, grid cells, shapefiles and further info.
 class CountryWDB(Document):
     name = StringField(required=True, max_length=200)
     shapefile = StringField(required=True)
@@ -15,7 +16,10 @@ class CountryWDB(Document):
     hasStarted = BooleanField()
     isFinished = BooleanField()
     hasImages = BooleanField()
+    trainSize = IntField(50, 600)
 
+
+# Class for running the country's classification process.
 class Country:
     def __init__(self, name, feature):
         self.name = name
@@ -24,30 +28,50 @@ class Country:
     def __init__(self, countryWDB):
         self.CountryWDB = countryWDB
 
+    # Returns the country name
     def GetName(self):
         return self.CountryWDB.name
 
+    # Returns the country asset name in the earth engine platform
     def GetAssetName(self):
-        return (self.ASSETPATH + self.GetName() + '/').replace(" ", "-")
+        return (ASSETPATH + self.GetName() + '/').replace(" ", "-")
 
+    # Returns the path of the grid file in GEE.
     def GetGridPath(self):
         return self.GetAssetName() + "Grid"
 
+    # Returns the execution priority of the country
     def GetPrio(self):
         return self.CountryWDB.prio
 
+    # Returns whether the execution of the country was already initialized.
     def hasStarted(self):
         return self.CountryWDB.hasStarted
 
+    # Returns whether the execution of the country is already finished.
     def hasFinished(self):
         return self.CountryWDB.isFinished
 
+    # Returns whether there are already some images exported of the given country.
     def hasImages(self):
         if self.CountryWDB.hasImages is None:
             self.CountryWDB.hasImages = False
             self.Save()
         return self.CountryWDB.hasImages
 
+    # Returns the training size.
+    def GetTrainSize(self):
+        if self.CountryWDB.trainSize is None:
+            self.CountryWDB.trainSize = 600
+            self.Save()
+        return self.CountryWDB.trainSize
+
+    # Decreases the training size by 20.
+    def DecreaseTrainsSize(self):
+        self.CountryWDB.trainSize -= 20
+        self.Save()
+
+    # Gets the country shapefile from GEE and combines it to one feature.
     def GetFeature(self):
         # Get the country shapefile and union to one in case it is split to many parts (like US and Russia).
         region = ee.FeatureCollection(STATES_SHAPE_EENGINE).filter(ee.Filter.eq('country_na', self.CountryWDB.shapefile)).union()
@@ -56,9 +80,11 @@ class Country:
         else:
             raise Exception("Country.GetFeature(): No Feature for the Country was found: {}. Country has to be in the ee.FeatureCollection('USDOS/LSIB_SIMPLE/2017') with property country_na".format(self.GetName()))
 
+    # Returns the grid cell.
     def GetGridCells(self):
         return self.CountryWDB.gridCells
 
+    # Returns whether the grid cell shapefile exists.
     def DoGridCellsExist(self):
         gridCells = self.GetGridCells()
         if gridCells is None:
@@ -76,11 +102,13 @@ class Country:
             return False
         return False
 
+    # Returns whether the classification is already finished.
     def IsClassificationFinished(self):
         self.CountryWDB.GridCells, finished = DriveApi.CheckClassificationProgress(self.GetName(), self.GetGridCells())
         self.Save()
         return finished
 
+    # Saves the mongo db object of the country
     def Save(self):
         self.CountryWDB.save()
 
@@ -156,6 +184,7 @@ class Country:
         tot = b + c + d + e
         return b/tot, c/tot, d/tot, e/tot
 
+    # Creates the asset in GEE
     def CreateAsset(self):
         assetName = self.GetAssetName()
         try:

@@ -15,6 +15,7 @@ class StateDB(Document):
     hasStarted = BooleanField()
     isFinished = BooleanField()
     hasImages = BooleanField()
+    trainSize = IntField(50,600)
 
 class State:
     def __init__(self, name, feature):
@@ -38,6 +39,16 @@ class State:
 
     def GetPrio(self):
         return self.stateDB.prio
+
+    def GetTrainSize(self):
+        if self.stateDB.trainSize is None:
+            self.stateDB.trainSize = 600
+            self.Save()
+        return self.stateDB.trainSize
+
+    def DecreaseTrainSize(self):
+        self.stateDB.trainSize -= 20
+        self.Save()
 
     def hasStarted(self):
         return self.stateDB.hasStarted

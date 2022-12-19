@@ -10,10 +10,12 @@ from ee.batch import Export
 from SatelliteImages import Satellite
 
 
+# Generates a classified image of a given area for all years.
 class Classify:
     def __init__(self):
         ee.Initialize()
 
+    # Runs the classification
     def DoClassification(self, features, classifier, number, id_name, start_year, end_year, countryName, doExport, latitudeRegion="North"):
         print("Classification of country: {} and for asset {}".format(countryName, number))
         bandNamesClassify = ee.List(['blue', 'green', 'red', 'nir', 'swir1', 'swir2', 'NDVI', 'NDBI', 'WI'])
@@ -91,121 +93,7 @@ class Classify:
         # Classified composite
         coll_year_class = coll_year.map(classifyImages)
 
-        # Function to calculate the area for a specific landcover (0/1 mask) for each feature
-        def calculateArea(image, features):
-            year = ee.Number(image.get("year")).format("%4d")
-            image = image.updateMask(image)
-
-            areaOfFeature = image.reduceRegions(collection=features, reducer=ee.Reducer.count(), scale=30, tileScale=1)
-            def countPixel(feat):
-                feat = feat.set("count", ee.String(feat.get("count")))
-                return ee.Feature(None, feat.set("year", year).toDictionary())
-            return areaOfFeature.map(countPixel)
-
-        # Format a table of triplets into a 2D table of rowId x colId.
-        # Features need to be reorganized in order to do a proper output.
-        def format(table, rowId, colId, propertyName):
-            # Get a FeatureCollection with unique row IDs.
-            rows = table.distinct(rowId);
-            # Join the table to the unique IDs to get a collection in which
-            # each feature stores a list of all features having a common row ID.
-            joined = ee.Join.saveAll('matches').apply(primary=rows, secondary=table,
-                condition=ee.Filter.equals(
-                    leftField=rowId,
-                    rightField=rowId))
-
-            def mapFeatures(feat):
-                feature = ee.Feature(feat)
-                return [feature.get(colId), ee.String(feature.get(propertyName))]
-            def mapValues(row):
-                # Map a function over the list of rows to return a list of column ID and value.
-                values = ee.List(row.get('matches')).map(mapFeatures)
-                # Save the Values from the Property name ('perc' or 'kartiert')
-                # Returns the row with its ID property and properties for
-                # all matching columns IDs storing the output of the reducer.
-                # The Dictionary constructor is using a list of key, value pairs.
-                return row.select([rowId]).set(ee.Dictionary(values.flatten()));
-
-            return joined.map(mapValues)
-
-        # Export the landcover of the features per year as csv file in the corresponding google drive folder and names it right
-        def exportFeatures(features, landcover, number, tasks):
-            filename = landcover + '-' + str(number) #+ 'b'
-            foldername = countryName + "-Classification"
-            task = Export.table.toDrive(features, description=filename, fileNamePrefix=filename, folder=foldername, fileFormat='CSV')
-            task.start()
-            tasks.append(task)
-            return task, foldername, filename
-
-        # Measure the landcover per feature per year and exports the data.
-        def measureLandcover(img, features):
-            # Measures the area for each landcover type per Gemeinde
-            def mapArea(img):
-                return calculateArea(img.select(bandname), features)
-
-            bandname = 'cloudfree'
-            cloudfreeCoverArea = img.map(mapArea)
-            bandname = 'urban'
-            builtupCoverArea = img.map(mapArea)
-            bandname = 'gras'
-            grasCoverArea = img.map(mapArea)
-            bandname = 'crops'
-            cropsCoverArea = img.map(mapArea)
-            bandname = 'forest'
-            forestCoverArea = img.map(mapArea)
-            bandname = 'noveg'
-            novegCoverArea = img.map(mapArea)
-            bandname = 'water'
-            waterCoverArea = img.map(mapArea)
-            bandname = 'totalPixel'
-            totalPixelCoverArea = img.map(mapArea)
-
-            tasks = []
-            # Export feature list
-            task = exportFeatures(features, 'features', number, tasks)
-            tasks.append(task)
-            # Export Cloud-free coverage data per year per feature
-            tableOutputCloudfree = format(cloudfreeCoverArea.flatten(), id_name, 'year', 'count')
-            task = exportFeatures(tableOutputCloudfree, 'cloudfree', number, tasks)
-            tasks.append(task)
-            # Export Builtup coverage data per year per feature
-            tableOutputBuiltup = format(builtupCoverArea.flatten(), id_name, 'year', 'count')
-            task = exportFeatures(tableOutputBuiltup, 'builtup', number, tasks)
-            tasks.append(task)
-            # Export Gras coverage data per year per feature
-            tableOutputGras = format(grasCoverArea.flatten(), id_name, 'year', 'count')
-            task = exportFeatures(tableOutputGras, 'gras', number, tasks)
-            tasks.append(task)
-            # Export Crops coverage data per year per feature
-            tableOutputCrops = format(cropsCoverArea.flatten(), id_name, 'year', 'count')
-            task = exportFeatures(tableOutputCrops, 'crops', number, tasks)
-            tasks.append(task)
-            # Export Forest coverage data per year per feature
-            tableOutputForest = format(forestCoverArea.flatten(), id_name, 'year', 'count')
-            task = exportFeatures(tableOutputForest, 'forest', number, tasks)
-            tasks.append(task)
-            # Export No Vegetation coverage data per year per feature
-            tableOutputNoVeg = format(novegCoverArea.flatten(), id_name, 'year', 'count')
-            task = exportFeatures(tableOutputNoVeg, 'noveg', number, tasks)
-            tasks.append(task)
-            # Export Water coverage data per year per feature
-            tableOutputWater = format(waterCoverArea.flatten(), id_name, 'year', 'count')
-            task = exportFeatures(tableOutputWater, 'water', number, tasks)
-            tasks.append(task)
-            # Export Cloud-free coverage data per year per feature
-            tableOutputTotalPixel = format(totalPixelCoverArea.flatten(), id_name, 'year', 'count')
-            task = exportFeatures(tableOutputTotalPixel, 'totalPixel', number, tasks)
-            tasks.append(task)
-
-            return tasks
-
-        if doExport:
-            # Measures the landcover per class per feature and exports it.
-            tasks = measureLandcover(coll_year_class, features)
-            print("Classify end")
-            return tasks
-        else:
-            # Returns the classified imagecollection.
-            return coll_year_class
+        # Returns the classified imagecollection.
+        return coll_year_class
 
 

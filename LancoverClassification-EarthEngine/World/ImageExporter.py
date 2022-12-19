@@ -1,14 +1,15 @@
 import ee
 from ee.batch import Export
-
 from Classify import Classify
 import DriveApi
 
 
+# Classifies the image and export it to the google drive.
 class ImageExporter:
     def __init__(self):
         ee.Initialize()
 
+    # Launches the execution of
     def RunImage(self, country, classifier, start_year, end_year):
         print("State image export of: {}".format(country.GetName()))
         self.start_year = start_year
@@ -27,16 +28,19 @@ class ImageExporter:
             country.Save()
             print("no image left")
         else:
-            # First cell not executed, execute
+            # Execute the first cell which is not yet finished
             cell = imageProgress[0][0]
             print("Total cells: {} , finished: {}: , todo: {}".format(len(rasterCells), len(rasterCells)-len(imageProgress[0]),len(imageProgress[0])))
             self.RunCellImage(cell)
 
+    # Executes the grids cells classification.
     def RunCellImage(self, cell):
+        # Create folder in the google drive.
         DriveApi.CreateImageFolder(self.country.GetName(), cell)
         classify = Classify()
 
-        # From -23.99 degree to +23.99 degree all year, else exclude winter (South or North)
+        # From -23.99 degree to +23.99 degree images of the whole year are taken.
+        # Else winter images are excluded (South or North).
         latitude = int(cell.split(",")[1].split(":")[1])
         latitudeRegion = "Equator"
         if latitude >= 24:
@@ -64,6 +68,7 @@ class ImageExporter:
             maskBorder = self.country.GetFeature().map(setNr).reduceToImage(properties=['ID'], reducer=ee.Reducer.first())
             image = image.mask(maskBorder).unmask(9)
 
+            # Export image to google drive
             filename = self.country.GetName() + '-image-' + str(cell) + "-" + str(year)
             foldername = self.country.GetName() + "-Image/" + str(cell)
             print(filename)
