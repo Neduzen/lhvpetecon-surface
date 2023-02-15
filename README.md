@@ -86,7 +86,7 @@ Execution of main.py:
 main.py will load all Country or States saved in the MongoDB.
 The specific executer.py is launch which goes through all country/states objects and identfies the next one to run (lowest priority number and not yet fully executed).
 Each country will be launched with the following sequence:
-- See whether all tasks on GEE are finished, if no sleep for 20minutes and repeat
+- See whether all tasks on GEE are finished, if no sleep for 20 minutes and repeat
 - Create trainingsdata
 - Create (lat/long) grid cells
 - Classify and export all grid cells (takes up to weeks for large countries)
@@ -96,10 +96,6 @@ Each country will be launched with the following sequence:
 
 <!-- LICENSE -->
 ## License
-
-Distributed under the MIT License. See `LICENSE.txt` for more information.
-
-<p align="right">(<a href="#top">back to top</a>)</p>
 
 
 
@@ -114,14 +110,4 @@ Project Link: [https://github.com/Neduzen/lhvpetecon-surface](https://github.com
 
 <p align="right">(<a href="#top">back to top</a>)</p>
 
-
-
-<!-- ACKNOWLEDGMENTS -->
-## Acknowledgments
-
-* []()
-* []()
-* []()
-
-<p align="right">(<a href="#top">back to top</a>)</p>
 
