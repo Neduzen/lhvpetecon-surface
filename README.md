@@ -73,19 +73,19 @@ Python programm with 3 different main.py programms.
 - One classifies European countries (country wise export). Trainingsdata produced from its own country.
 - One classifies US (State wise export). Trainingsdata produced based on EU countries with similar climate conditions.
 - One classifies all other countries (country wise export). Trainingsdata produced based on EU countries with similar climate conditions.
-
-Setup countries to execute:
+<br />
+Setup countries to execute:<br />
 Run the function 'addNewCountry()' in the specific main.py (EU, USA, World) with a country name and priority.<br />
 Example:<br />
   addNewCountry("Chad", 0)<br />
 The python program will create a GEE asset folder and create a MongoDB entry for the country containing all needed information for the automatic execution.<br />
 Whenever the country name is equals to the the countrys' feature in GEE featurecollection ('USDOS/LSIB_SIMPLE/2017'), no additional input needs to be done.<br />
-For countries with special names, the correct name has to be assigned to the MongoDB entry of shapefile="..." matching the country feature value in the property 'country_na' of the GEE featurecollection ('USDOS/LSIB_SIMPLE/2017').<br />
+For countries with special names, the correct name has to be assigned to the MongoDB entry of shapefile="..." matching the country feature value in the property 'country_na' of the GEE featurecollection ('USDOS/LSIB_SIMPLE/2017').<br /><br />
 
-Execution of main.py:
+Execution of main.py:<br />
 main.py will load all Country or States saved in the MongoDB.<br />
-The specific executer.py is launch which goes through all country/states objects and identfies the next one to run (lowest priority number and not yet fully executed).<br />
-Each country will be launched with the following sequence:
+The specific executer.py is launch which goes through all country/states objects and identfies the next one to run (lowest priority number and not yet fully executed).<br /><br />
+Each country will be launched with the following sequence:<br />
 - See whether all tasks on GEE are finished, if no sleep for 20 minutes and repeat
 - Create trainingsdata
 - Create (lat/long) grid cells
