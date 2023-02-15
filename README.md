@@ -75,16 +75,16 @@ Python programm with 3 different main.py programms.
 - One classifies all other countries (country wise export). Trainingsdata produced based on EU countries with similar climate conditions.
 
 Setup countries to execute:
-Run the function 'addNewCountry()' in the specific main.py (EU, USA, World) with a country name and priority.
-Example:
-  addNewCountry("Chad", 0)
-The python program will create a GEE asset folder and create a MongoDB entry for the country containing all needed information for the automatic execution.
-Whenever the country name is equals to the the countrys' feature in GEE featurecollection ('USDOS/LSIB_SIMPLE/2017'), no additional input needs to be done.
-For countries with special names, the correct name has to be assigned to the MongoDB entry of shapefile="..." matching the country feature value in the property 'country_na' of the GEE featurecollection ('USDOS/LSIB_SIMPLE/2017').
+Run the function 'addNewCountry()' in the specific main.py (EU, USA, World) with a country name and priority.<br />
+Example:<br />
+  addNewCountry("Chad", 0)<br />
+The python program will create a GEE asset folder and create a MongoDB entry for the country containing all needed information for the automatic execution.<br />
+Whenever the country name is equals to the the countrys' feature in GEE featurecollection ('USDOS/LSIB_SIMPLE/2017'), no additional input needs to be done.<br />
+For countries with special names, the correct name has to be assigned to the MongoDB entry of shapefile="..." matching the country feature value in the property 'country_na' of the GEE featurecollection ('USDOS/LSIB_SIMPLE/2017').<br />
 
 Execution of main.py:
-main.py will load all Country or States saved in the MongoDB.
-The specific executer.py is launch which goes through all country/states objects and identfies the next one to run (lowest priority number and not yet fully executed).
+main.py will load all Country or States saved in the MongoDB.<br />
+The specific executer.py is launch which goes through all country/states objects and identfies the next one to run (lowest priority number and not yet fully executed).<br />
 Each country will be launched with the following sequence:
 - See whether all tasks on GEE are finished, if no sleep for 20 minutes and repeat
 - Create trainingsdata
