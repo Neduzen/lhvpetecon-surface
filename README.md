@@ -5,10 +5,9 @@
 <!-- PROJECT LOGO -->
 <br />
 <div align="center">
-
-<h3 align="center">Proxying Economic Activity with Daytime Satellite Imagery: Filling Data Gaps Across Time and Space</h3>
+  <h3 align="center">Proxying Economic Activity with Daytime Satellite Imagery: Filling Data Gaps Across Time and Space</h3>
 </div>
-
+<br /><br />
 Code and data in this repository are published under a [license Code] license. </br>
 Citation of code and data in this repository: </br>
 ---
