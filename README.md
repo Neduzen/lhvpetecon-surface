@@ -74,9 +74,9 @@ Python programm with 3 different main.py programms.
 Setup countries to execute:<br />
 Run the function 'addNewCountry()' in the specific main.py (EU, USA, World) with a country name and priority.<br />
 Example:<br />
-<hr>
+'''
     addNewCountry("Chad", 0)
-<hr>
+'''
 <br />
 The python program will create a GEE asset folder and create a MongoDB entry for the country containing all needed information for the automatic execution.<br />
 Whenever the country name is equals to the the countrys' feature in GEE featurecollection ('USDOS/LSIB_SIMPLE/2017'), no additional input needs to be done.<br />
