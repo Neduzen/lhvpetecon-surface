@@ -8,6 +8,9 @@
   <h3 align="center">Proxying Economic Activity with Daytime Satellite Imagery: Filling Data Gaps Across Time and Space</h3>
 </div>
 <br /><br />
+
+<!-- LICENSE -->
+## Data and license
 Code and data in this repository are published under a [license Code] license. </br>
 Citation of code and data in this repository: </br>
 ---
@@ -15,7 +18,8 @@ Lehnert, P., Niederberger, M., Backes-Gellner, U., & Bettinger, E., "Proxying ec
 ---
 </br></br>
 
-Global surface groups data will be available via SWISSUbase (project number 20253, https://www.swissubase.ch/de/catalogue/studies/20253/18714/overview). Until The SWISSUbase repository will be online, the surface TIF and CSV files used in our article are available here: </br>
+Global surface groups data will be available via SWISSUbase (project number 20253, https://www.swissubase.ch/de/catalogue/studies/20253/18714/overview).<br />
+Until The SWISSUbase repository will be online, the surface TIF and CSV files used in our article are available here: </br>
 Germany: https://www.dropbox.com/sh/auo1f781slew713/AACiWbvepWvWuSzGZZNYgDska?dl=0 </br>
 Guinea: https://www.dropbox.com/sh/60rpr5wl16md9tn/AABjVzvoqeXuydWrCwVCUwIXa?dl=0  </br>
 Togo: https://www.dropbox.com/sh/2k10l6xhfeduwyx/AACxsVEesC_XTcRQNpTt9y61a?dl=0  </br>
@@ -109,9 +113,6 @@ Each country will be launched with the following sequence:<br />
 - Validation (for EU countries)
 - Mark country as finished
 
-
-<!-- LICENSE -->
-## License
 
 
 
