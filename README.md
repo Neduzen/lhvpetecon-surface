@@ -36,9 +36,9 @@ Until The SWISSUbase repository will be online, the surface TIF and CSV files us
 <!-- ABOUT THE PROJECT -->
 ## About The Project
 
-Satellite image analysis is done with the Google Earth Engine Python API.<br />
-Data aggregation is conducted with ArcGIS Python scripts.<br />
-Data analysis is performed with Stata scripts.<br />
+Satellite image classification is done by using the Google Earth Engine Python API in python.<br />
+Data aggregation was conducted with ArcGIS Python scripts.<br />
+Data analysis was performed with Stata scripts.<br />
 
 
 <!-- GETTING STARTED -->
@@ -74,9 +74,9 @@ Python programm with 3 different main.py programms.
 Setup countries to execute:<br />
 Run the function 'addNewCountry()' in the specific main.py (EU, USA, World) with a country name and priority.<br />
 Example:<br />
-```
+<hr>
     addNewCountry("Chad", 0)
-```
+<hr>
 <br />
 The python program will create a GEE asset folder and create a MongoDB entry for the country containing all needed information for the automatic execution.<br />
 Whenever the country name is equals to the the countrys' feature in GEE featurecollection ('USDOS/LSIB_SIMPLE/2017'), no additional input needs to be done.<br />
