@@ -11,12 +11,16 @@
 
 <!-- LICENSE -->
 ## Data and license
+
+<div>
 Code and data in this repository are published under a [license Code] license. </br>
-Citation of code and data in this repository: </br>
----
-Lehnert, P., Niederberger, M., Backes-Gellner, U., & Bettinger, E., "Proxying economic activity with daytime satellite imagery: Filling data gaps across time and space", PNAS Nexus (forthcoming).
----
-</br></br>
+Citation of code and data in this repository: 
+</div>
+<hr>
+<div>
+Lehnert, P., Niederberger, M., Backes-Gellner, U., & Bettinger, E., "Proxying economic activity with daytime satellite imagery: Filling data gaps across time and space", PNAS Nexus (forthcoming).</div>
+<hr>
+</br>
 
 Global surface groups data will be available via SWISSUbase (project number 20253, https://www.swissubase.ch/de/catalogue/studies/20253/18714/overview).<br />
 Until The SWISSUbase repository will be online, the surface TIF and CSV files used in our article are available here: </br>
