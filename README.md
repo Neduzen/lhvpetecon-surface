@@ -13,12 +13,12 @@
 ## Data and license
 
 <div>
-Code and data in this repository are published under a [license Code] license. </br>
+Code and data in this repository are published under a Creative Commons Attribution-NonCommercial-NoDerivs licence (https://creativecommons.org/licenses/by-nc-nd/4.0/) license according to the journal publication. </br>
 Citation of code and data in this repository: 
 </div>
 <hr>
 <div>
-Lehnert, P., Niederberger, M., Backes-Gellner, U., & Bettinger, E., "Proxying economic activity with daytime satellite imagery: Filling data gaps across time and space", PNAS Nexus (forthcoming).</div>
+Lehnert, P., Niederberger, M., Backes-Gellner, U., & Bettinger, E., "Proxying economic activity with daytime satellite imagery: Filling data gaps across time and space", PNAS Nexus (forthcoming). https://doi.org/10.1093/pnasnexus/pgad099</div>
 <hr>
 </br>
 
