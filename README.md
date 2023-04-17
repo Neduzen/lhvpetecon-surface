@@ -99,7 +99,7 @@ Each country will be launched with the following sequence:<br />
 
 Patrick Lehnert - patrick.lehnert@business.uzh.ch
 
-Michael Niederberger - michael.niederberger@uzh.ch
+Michael Niederberger - michael.niederberger@geo.uzh.ch
 
 Project Link: [https://github.com/Neduzen/lhvpetecon-surface](https://github.com/Neduzen/lhvpetecon-surface)
 
