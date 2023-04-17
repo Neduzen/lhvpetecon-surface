@@ -53,13 +53,11 @@ To reproduce the data processing the following things are necessary:
 
 <!-- USAGE EXAMPLES -->
 ## Setup
-After installing python and setting up a GEE account, the computer where python is running needs the authorization of using GEE with the created account.
-Further python authorization for a Google Drive accounts needs to be made.
+After installing python and setting up a GEE account, the python needs the authorization of using GEE and google Drive.
 Also MongoDB needs to be installed and setup with three databases: 
       'landcover', host='localhost', port=27017 for EU data
       'landcover-USA', host='localhost', port=27017 for US data
       'landcover-World', host='localhost', port=27017 for world data
-After preparing all the setup and installing all needed python packages, the Satellite 
 
 
 <!-- USAGE -->
@@ -79,8 +77,8 @@ Example:<br />
 '''
 <br />
 The python program will create a GEE asset folder and create a MongoDB entry for the country containing all needed information for the automatic execution.<br />
-Whenever the country name is equals to the the countrys' feature in GEE featurecollection ('USDOS/LSIB_SIMPLE/2017'), no additional input needs to be done.<br />
-For countries with special names, the correct name has to be assigned to the MongoDB entry of shapefile="..." matching the country feature value in the property 'country_na' of the GEE featurecollection ('USDOS/LSIB_SIMPLE/2017').<br /><br />
+Whenever the country name is equals to the the countrys' feature name in GEE featurecollection ('USDOS/LSIB_SIMPLE/2017'), no additional input needs to be done.<br />
+For countries with special names, the correct GEE feature name has to be assigned to the MongoDB entry at the variable shapefile="...", which has to match the country feature value in the property 'country_na' of the GEE featurecollection ('USDOS/LSIB_SIMPLE/2017').<br /><br />
 
 Execution of main.py:<br />
 main.py will load all Country or States saved in the MongoDB.<br />
