@@ -70,9 +70,10 @@ For more information see our paper and its supplementary material https://doi.or
 ### Setup
 After installing python and setting up a GEE account, the python needs the authorization of using GEE and Google Drive.
 Also MongoDB needs to be installed and set up with three databases according to the three different program specifications (see above): 
-      'landcover', host='localhost', port=27017 for Europe data
-      'landcover-USA', host='localhost', port=27017 for USA data
-      'landcover-World', host='localhost', port=27017 for world data
+- 'landcover', host='localhost', port=27017 for Europe data
+- 'landcover-USA', host='localhost', port=27017 for USA data
+- 'landcover-World', host='localhost', port=27017 for world data
+
 <br />
 Setup countries to execute:<br />
 Run the function 'addNewCountry()' in the specific main.py (EU, USA, World) with a country name and priority.<br />
