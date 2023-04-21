@@ -36,9 +36,9 @@ Until The SWISSUbase repository will be online, the surface TIF and CSV files us
 <!-- ABOUT THE PROJECT -->
 ## About The Project
 
-Satellite image classification is done by using the Google Earth Engine Python API in python.<br />
-Data aggregation was conducted with ArcGIS Python scripts.<br />
-Data analysis was performed with Stata scripts.<br />
+Satellite image classification is done by using the Google Earth Engine Python API in python. The underlying code can be found in the "LandcoverClassification-EarthEngine" folder.<br />
+Data aggregation for the analyses in our PNAS Nexus publication was conducted with ArcGIS Python scripts. The underlying code can be found in the "ArcPy" folder.<br />
+Data analysis for our PNAS Nexus publication was performed with Stata scripts. The underlying code can be found in the "Stata" folder.<br />
 
 
 <!-- GETTING STARTED -->
