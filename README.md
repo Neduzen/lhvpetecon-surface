@@ -18,7 +18,7 @@ Citation of code and data in this repository:
 </div>
 <hr>
 <div>
-Lehnert, P., Niederberger, M., Backes-Gellner, U., & Bettinger, E., "Proxying economic activity with daytime satellite imagery: Filling data gaps across time and space", PNAS Nexus (forthcoming). https://doi.org/10.1093/pnasnexus/pgad099</div>
+Lehnert, P., Niederberger, M., Backes-Gellner, U., & Bettinger, E., "Proxying economic activity with daytime satellite imagery: Filling data gaps across time and space", PNAS Nexus, 2(4). https://doi.org/10.1093/pnasnexus/pgad099</div>
 <hr>
 </br>
 
@@ -41,6 +41,9 @@ Until The SWISSUbase repository will be online, the surface TIF and CSV files us
 * Data analysis for our PNAS Nexus publication was performed with Stata scripts. The underlying code can be found in the "Stata" folder.<br />
 
 
+## Instructions for Satellite Image Classification
+
+
 <!-- GETTING STARTED -->
 ### Prerequisites
 To reproduce the data processing the following things are necessary:
@@ -51,23 +54,25 @@ To reproduce the data processing the following things are necessary:
 * ArcGIS Installation
 
 
-<!-- USAGE EXAMPLES -->
-## Setup
-After installing python and setting up a GEE account, the python needs the authorization of using GEE and google Drive.
-Also MongoDB needs to be installed and setup with three databases: 
-      'landcover', host='localhost', port=27017 for EU data
-      'landcover-USA', host='localhost', port=27017 for US data
-      'landcover-World', host='localhost', port=27017 for world data
-
-
 <!-- USAGE -->
-## Usage
+### Program Specifications
 
 Satellite image analysis: 
-Python program with 3 different main.py versions:
+Python program with 3 different main.py specifications:
 - Europe: Classifies European countries that participate in the CORINE Land Cover (CLC) program. Training data are produced for each country separately. Data are exported at the country level.
 - USA: Classifies U.S. states. Training data are produced for each state from CLC countries in similar climate zones. Data are exported at the state level. Use and adapt this code if you wish to perform classification at a sub-country regional level.
 - World: Classifies any country in the world. Training data are produced for each country from CLC countries in similar climate zones. Data are exported at the country level. This code version can also be used to classify rectangular regions based on latitude/longitude coordinates, with training data produced for the selected region.
+
+For more information see our paper and its supplementary material https://doi.org/10.1093/pnasnexus/pgad099
+
+
+<!-- USAGE EXAMPLES -->
+### Setup
+After installing python and setting up a GEE account, the python needs the authorization of using GEE and Google Drive.
+Also MongoDB needs to be installed and set up with three databases according to the three different program specifications (see above): 
+      'landcover', host='localhost', port=27017 for Europe data
+      'landcover-USA', host='localhost', port=27017 for USA data
+      'landcover-World', host='localhost', port=27017 for world data
 <br />
 Setup countries to execute:<br />
 Run the function 'addNewCountry()' in the specific main.py (EU, USA, World) with a country name and priority.<br />
@@ -76,8 +81,8 @@ Example:<br />
     addNewCountry("Chad", 0)
 '''
 <br />
-The python program will create a GEE asset folder and create a MongoDB entry for the country containing all needed information for the automatic execution.<br />
-Whenever the country name is equals to the the countrys' feature name in GEE featurecollection ('USDOS/LSIB_SIMPLE/2017'), no additional input needs to be done.<br />
+The python program will create a GEE asset folder and create a MongoDB entry for the country containing all required information for the automatic execution.<br />
+Whenever the country name is equals to the country's feature name in GEE feature collection ('USDOS/LSIB_SIMPLE/2017'), no additional input is necessary.<br />
 For countries with special names, the correct GEE feature name has to be assigned to the MongoDB entry at the variable shapefile="...", which has to match the country feature value in the property 'country_na' of the GEE featurecollection ('USDOS/LSIB_SIMPLE/2017').<br /><br />
 
 Execution of main.py:<br />
@@ -92,7 +97,7 @@ Each country will be launched with the following sequence:<br />
 - Mark country as finished
 
 
-## Versioning
+### Versioning
 The "LandcoverClassification-EarthEngine" folder contains the most recent version of the classification code. The current version is 1.0.0, which is also the version used to produce that data for the PNAS Nexus publication. After updates, old versions of the code will be maintained in this repository.
 
 
