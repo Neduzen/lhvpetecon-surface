@@ -23,7 +23,7 @@ Lehnert, P., Niederberger, M., Backes-Gellner, U., & Bettinger, E., "Proxying ec
 </br>
 
 Global surface groups data will be available via SWISSUbase (project number 20253, https://www.swissubase.ch/de/catalogue/studies/20253/18714/overview).<br />
-The TIF and CSV files needed for replicating our analyses in the journal publication are available in the "Replication_Files" folder. </br>
+ </br>
 
 
 
@@ -32,7 +32,8 @@ The TIF and CSV files needed for replicating our analyses in the journal publica
 
 * Satellite image classification is done by using the Google Earth Engine Python API in python. The underlying code can be found in the "LandcoverClassification-EarthEngine" folder.<br />
 * Data aggregation for the analyses in our PNAS Nexus publication was conducted with ArcGIS Python scripts. The underlying code can be found in the "ArcPy" folder.<br />
-* Data analysis for our PNAS Nexus publication was performed with Stata scripts. The underlying code can be found in the "Stata" folder.<br />
+* Data analysis for our PNAS Nexus publication was performed with Stata scripts. The underlying code can be found in the "Stata" folder.
+* The TIF and CSV files needed for replicating our analyses in the PNAS Nexus publication are available in the "Replication_Files" folder.<br />
 
 
 ## Instructions for Satellite Image Classification
