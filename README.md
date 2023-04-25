@@ -20,7 +20,7 @@ Citation of code and data in this repository:
 <div>
 Lehnert, P., Niederberger, M., Backes-Gellner, U., & Bettinger, E., "Proxying economic activity with daytime satellite imagery: Filling data gaps across time and space", PNAS Nexus, 2(4). https://doi.org/10.1093/pnasnexus/pgad099</div>
 <hr>
-</br>
+
 
 Global surface groups data will be available via SWISSUbase (project number 20253, https://www.swissubase.ch/de/catalogue/studies/20253/18714/overview).<br />
  </br>
