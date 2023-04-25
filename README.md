@@ -23,7 +23,7 @@ Lehnert, P., Niederberger, M., Backes-Gellner, U., & Bettinger, E., "Proxying ec
 </br>
 
 Global surface groups data will be available via SWISSUbase (project number 20253, https://www.swissubase.ch/de/catalogue/studies/20253/18714/overview).<br />
-The TIF and CSV files needed for replicating our analyses in the journal publication are available in the folder "Replication_Files". </br>
+The TIF and CSV files needed for replicating our analyses in the journal publication are available in the "Replication_Files" folder. </br>
 
 
 
