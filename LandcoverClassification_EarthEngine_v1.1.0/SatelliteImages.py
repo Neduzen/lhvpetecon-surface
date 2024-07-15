@@ -55,10 +55,6 @@ class Satellite:
             image.select('brightness').gte(1.0))
         image = image.addBands(badPix.rename('Bad'))
 
-        # TODO: Switch for excluding bad pixels
-        # Mask all bad pixels
-        #image = image.updateMask(image.select('Bad').eq(0))
-
         return image
 
     # Adds a new band 'brightness' to the image.VIS, NIR and SWIR bands are summed up.
