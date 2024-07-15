@@ -22,7 +22,7 @@ Lehnert, P., Niederberger, M., Backes-Gellner, U., & Bettinger, E., "Proxying ec
 <hr>
 
 
-Global surface groups data will be available via SWISSUbase (project number 20253, https://www.swissubase.ch/de/catalogue/studies/20253/18714/overview).<br />
+Global surface groups are available via SWISSUbase (project number 20253, https://www.swissubase.ch/de/catalogue/studies/20253/18714/overview). For an overview of download links by country and region, see https://plehnert.github.io/surfacegroups/.<br />
  </br>
 
 
@@ -94,7 +94,12 @@ Each country will be launched with the following sequence:<br />
 
 
 ### Versioning
-The "LandcoverClassification-EarthEngine" folder contains the most recent version of the classification code. The current version is 1.0.0, which is also the version used to produce that data for the PNAS Nexus publication. After updates, old versions of the code will be maintained in this repository.
+The folder "LandcoverClassification-EarthEngine_v1.1.0" contains the most recent version of the classification code (1.1.0). The folder "LandcoverClassification-EarthEngine_CodeArchive" contains all previous versions, including version 1.0.0 used to produce the data in the PNAS Nexus publication.
+
+Update 1.1.0 includes two changes:
+- After the discontuination of Landsat Collection 1 and its removal from the GEE Data Catalog, the new code uses the new Landsat Collection 2.
+- Classification at the sub-country level (i.e., similar to "USA" specification), can now also be implemented in the "World" specification. To do so, a shapefile with sub-country boundaries has to be uploaded to GEE as an asset. See MainWorld.py for further instructions.
+- The files in the "Europe" and "USA" specification subfolders remained unchanged.
 
 
 
